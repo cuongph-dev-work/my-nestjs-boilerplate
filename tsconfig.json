@@ -17,6 +17,7 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
+    "esModuleInterop": true,
     "paths": {
       "@configs/*": ["src/configs/*"],
       "@filters/*": ["src/filters/*"],
@@ -25,9 +26,9 @@
       "@decorators/*": ["src/decorators/*"],
       "@commands/*": ["src/commands/*"],
       "@shared/*": ["src/shared/*"],
-      "@utils/*": ["src/utils/*"]
+      "@utils/*": ["src/utils/*"],
     }
   },
-  "include": ["src/**/*", "ecosystem.config.js", ".eslintrc.js"],
+  "include": ["src/**/*", "ecosystem.config.js", ".eslintrc.cjs", "mikro-orm.config.ts"],
   "exclude": ["node_modules", "dist"]
 }

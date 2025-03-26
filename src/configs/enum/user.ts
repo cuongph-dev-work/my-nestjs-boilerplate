@@ -1,0 +1,6 @@
+export enum USER_ROLE {
+  SALE = 'SALE',
+  OPERATOR = 'OPERATOR',
+  TOUR_GUIDE = 'TOUR_GUIDE',
+  ACCOUNTANT = 'ACCOUNTANT',
+}

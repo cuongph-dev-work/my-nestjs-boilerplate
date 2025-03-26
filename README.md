@@ -68,15 +68,16 @@ Create a `.env` file in the root directory with the following variables:
 
 ```env
 # Database
-DATABASE_HOST=localhost
-DATABASE_PORT=5432
-DATABASE_USERNAME=postgres
-DATABASE_PASSWORD=postgres
-DATABASE_NAME=s_tour
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=qkqDwVzP2a60Tkx
+DB_NAME=s-tour-dev
 
 # Redis
 REDIS_HOST=localhost
 REDIS_PORT=6379
+REDIS_PASSWORD=
 
 # Mail
 MAIL_HOST=localhost
@@ -106,19 +107,19 @@ The application uses MikroORM for database management. Here are the available mi
 
 ```bash
 # Create a new migration
-npm run migration:create
+pnpm migration:create --name name_migration
 
 # Apply pending migrations
-npm run migration:up
+pnpm migration:up
 
 # Revert the last migration
-npm run migration:down
+pnpm migration:down
 
 # Show pending migrations
-npm run migration:pending
+pnpm migration:pending
 
 # Drop all tables and run all migrations from scratch
-npm run migration:fresh
+pnpm migration:fresh
 ```
 
 ### Seeding
@@ -127,24 +128,10 @@ To seed the database with initial data:
 
 ```bash
 # Run the database seeder
-npm run seed
+pnpm seed:create name_seeder
 
 # Refresh database (drop all tables, run migrations, and seed)
-npm run db:refresh
-```
-
-## Testing
-
-```bash
-# Unit tests
-npm run test
-npm run test:watch
-
-# e2e tests
-npm run test:e2e
-
-# Test coverage
-npm run test:cov
+pnpm db:refresh
 ```
 
 ## Project Structure

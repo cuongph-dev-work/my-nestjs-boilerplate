@@ -1,4 +1,4 @@
-import { NODE_ENV } from '@constants/app.constant';
+import { NODE_ENV } from '@configs/enum/app';
 
 export interface Config {
   database: DatabaseConfig;
@@ -27,8 +27,6 @@ export interface DatabaseConfig {
 }
 
 export interface JwtConfig {
-  accessSecret: string;
-  refreshSecret: string;
   expiresIn: string;
   refreshIn: string;
 }

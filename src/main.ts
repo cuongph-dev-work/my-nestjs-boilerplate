@@ -1,16 +1,16 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import * as compression from 'compression';
+import compression from 'compression';
 import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
 import { formatErrors } from '@utils/format-error-http';
 import { ConfigService } from '@nestjs/config';
 import {
   I18nValidationExceptionFilter,
   i18nValidationErrorFactory,
+  I18nService,
 } from 'nestjs-i18n';
 import { useContainer } from 'class-validator';
 import { HttpExceptionFilter } from './filters/http-exception.filter';
-import { I18nService } from 'nestjs-i18n';
 import helmet from 'helmet';
 
 async function bootstrap() {

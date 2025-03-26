@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import {
   AcceptLanguageResolver,
   CookieResolver,
@@ -11,11 +11,13 @@ import * as Joi from 'joi';
 import configs from '@configs/app';
 import { BullModule } from '@nestjs/bullmq';
 import { ScheduleModule } from '@nestjs/schedule';
-import { I18nConfigService } from '@configs/service/i18n.service';
 import { BullConfigService } from '@configs/service/bull.service';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { MikroOrmConfigService } from '@configs/service/mikro-orm.service';
-
+import modules from './modules';
+import { join } from 'path';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAccessTokenGuard } from '@modules/auth/guards/jwt-access-token.guard';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -29,16 +31,13 @@ import { MikroOrmConfigService } from '@configs/service/mikro-orm.service';
 
         DB_HOST: Joi.string().required(),
         DB_PORT: Joi.number().required(),
-        DB_USERNAME: Joi.string().required(),
+        DB_USER: Joi.string().required(),
         DB_PASSWORD: Joi.string().required(),
         DB_NAME: Joi.string().required(),
 
         REDIS_HOST: Joi.string().required(),
         REDIS_PORT: Joi.number().required(),
-        REDIS_PASSWORD: Joi.string().required(),
 
-        JWT_ACCESS_SECRET: Joi.string().required(),
-        JWT_REFRESH_SECRET: Joi.string().required(),
         JWT_EXPIRES_IN: Joi.string().required(),
         JWT_REFRESH_IN: Joi.string().required(),
       }),
@@ -49,21 +48,38 @@ import { MikroOrmConfigService } from '@configs/service/mikro-orm.service';
       useClass: MikroOrmConfigService,
     }),
     I18nModule.forRootAsync({
-      useClass: I18nConfigService,
+      useFactory: (configService: ConfigService) => ({
+        fallbackLanguage: configService.get<string>(
+          'app.fallbackLanguage',
+          'vi',
+        ),
+        loaderOptions: {
+          path: join(__dirname, 'i18n'),
+          watch: true,
+        },
+        typesOutputPath: join(process.cwd(), 'src/generated/i18n.generated.ts'),
+        viewEngine: 'hbs',
+      }),
       resolvers: [
         new QueryResolver(['lang', 'locale', 'l']),
         new CookieResolver(),
         new HeaderResolver(['lang']),
         new AcceptLanguageResolver(),
       ],
+      inject: [ConfigService],
     }),
     BullModule.forRootAsync({
       useClass: BullConfigService,
     }),
     ScheduleModule.forRoot(),
-    // ...modules,
+    ...modules,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: JwtAccessTokenGuard,
+    },
+  ],
 })
 export class AppModule {}

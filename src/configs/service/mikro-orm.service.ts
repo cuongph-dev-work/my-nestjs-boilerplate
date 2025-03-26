@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { LoadStrategy } from '@mikro-orm/core';
 import {
   MikroOrmModuleSyncOptions,
   MikroOrmOptionsFactory,
 } from '@mikro-orm/nestjs';
+import { LoadStrategy } from '@mikro-orm/core';
 import { PostgreSqlDriver } from '@mikro-orm/postgresql';
 
 /**
@@ -20,6 +20,7 @@ export class MikroOrmConfigService implements MikroOrmOptionsFactory {
    * @returns MikroORM configuration options
    */
   createMikroOrmOptions(): MikroOrmModuleSyncOptions {
+    // Override with NestJS config service values
     return {
       driver: PostgreSqlDriver,
       host: this.configService.get<string>('database.host'),
@@ -27,6 +28,7 @@ export class MikroOrmConfigService implements MikroOrmOptionsFactory {
       user: this.configService.get<string>('database.username'),
       password: this.configService.get<string>('database.password'),
       dbName: this.configService.get<string>('database.database'),
+      debug: this.configService.get('app.nodeEnv') === 'development',
       entities: ['dist/**/*.entity.js'],
       entitiesTs: ['src/**/*.entity.ts'],
       migrations: {
@@ -41,16 +43,16 @@ export class MikroOrmConfigService implements MikroOrmOptionsFactory {
         defaultSeeder: 'DatabaseSeeder',
         emit: 'ts',
       },
-      debug: this.configService.get('app.nodeEnv') === 'development',
       loadStrategy: LoadStrategy.JOINED,
       allowGlobalContext: true,
       validateRequired: true,
       strict: true,
-      autoLoadEntities: false,
       pool: {
         min: 2,
         max: 10,
       },
+
+      autoLoadEntities: false,
     };
   }
 }
