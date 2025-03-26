@@ -15,6 +15,7 @@ export interface AppConfig {
   headerLanguage: string;
   redisHost: string;
   redisPort: number;
+  redisPassword: string;
 }
 
 export interface DatabaseConfig {

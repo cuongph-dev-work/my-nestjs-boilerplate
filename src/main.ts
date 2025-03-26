@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as compression from 'compression';
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
 import { formatErrors } from '@utils/format-error-http';
 import { ConfigService } from '@nestjs/config';
 import {
@@ -10,6 +10,8 @@ import {
 } from 'nestjs-i18n';
 import { useContainer } from 'class-validator';
 import { HttpExceptionFilter } from './filters/http-exception.filter';
+import { I18nService } from 'nestjs-i18n';
+import helmet from 'helmet';
 
 async function bootstrap() {
   const logger = new Logger(bootstrap.name);
@@ -18,7 +20,11 @@ async function bootstrap() {
     logger: ['error', 'warn', 'debug', 'log'],
   });
   app.use(compression());
+  app.use(helmet());
   app.useLogger(app.get(Logger));
+  app.enableVersioning({
+    type: VersioningType.URI,
+  });
   app.setGlobalPrefix('/api');
   app.enableCors();
 
@@ -37,7 +43,7 @@ async function bootstrap() {
       errorFormatter: formatErrors,
       errorHttpStatusCode: 422,
     }),
-    new HttpExceptionFilter(),
+    new HttpExceptionFilter(app.get(ConfigService), app.get(I18nService)),
   );
 
   useContainer(app.select(AppModule), { fallbackOnErrors: true });

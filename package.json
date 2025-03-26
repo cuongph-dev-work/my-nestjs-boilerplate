@@ -17,9 +17,19 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "migration:create": "mikro-orm migration:create",
+    "migration:up": "mikro-orm migration:up",
+    "migration:down": "mikro-orm migration:down",
+    "migration:pending": "mikro-orm migration:pending",
+    "migration:fresh": "mikro-orm migration:fresh",
+    "seed": "mikro-orm seeder:seed",
+    "db:refresh": "npm run migration:fresh && npm run seed"
   },
   "dependencies": {
+    "@mikro-orm/core": "^6.4.11",
+    "@mikro-orm/nestjs": "^6.1.1",
+    "@mikro-orm/postgresql": "^6.4.11",
     "@nestjs/bullmq": "^11.0.2",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.1",
@@ -39,6 +49,7 @@
     "csv-parser": "^3.2.0",
     "dotenv": "^16.4.7",
     "hbs": "^4.2.0",
+    "helmet": "^8.1.0",
     "joi": "^17.13.3",
     "lodash": "^4.17.21",
     "nestjs-i18n": "^10.5.1",

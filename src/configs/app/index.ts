@@ -13,6 +13,7 @@ const configs = (): Config => {
       headerLanguage: process.env.APP_HEADER_LANGUAGE || 'x-custom-lang',
       redisHost: process.env.REDIS_HOST || 'localhost',
       redisPort: parseInt(process.env.REDIS_PORT || '6379'),
+      redisPassword: process.env.REDIS_PASSWORD || 'password',
     },
     database: {
       host: process.env.DATABASE_HOST || 'localhost',
