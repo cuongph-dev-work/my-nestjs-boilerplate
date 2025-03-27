@@ -1,17 +1,14 @@
 import {
   forwardRef,
-  HttpStatus,
   Inject,
   Injectable,
   NotFoundException,
-  UnprocessableEntityException,
 } from '@nestjs/common';
 import { User } from '../../database/entities/user.entity';
 import { I18nService } from 'nestjs-i18n';
 import { UserRepository } from './user.repository';
 import { CreateUserDto, ShowUserResponseDto } from './dtos';
 import { plainToInstance } from 'class-transformer';
-import { ValidationError } from 'class-validator';
 import { transformToValidationError } from '@utils/helper';
 
 @Injectable()
@@ -25,7 +22,10 @@ export class UserService {
   private async checkUniqueEmail(email: string) {
     const user = await this.userRepository.findByEmail(email, []);
     if (user) {
-      throw transformToValidationError('email', 'IsUnique', {}, this.i18n);
+      throw transformToValidationError(
+        [{ property: 'email', key: 'IsUnique', params: {} }],
+        this.i18n,
+      );
     }
   }
 

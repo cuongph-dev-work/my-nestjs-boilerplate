@@ -8,7 +8,6 @@ import {
 import { EntityManager } from '@mikro-orm/postgresql';
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dtos';
-import { assign } from 'lodash';
 
 @Injectable()
 export class UserRepository extends EntityRepository<User> {
@@ -54,8 +53,8 @@ export class UserRepository extends EntityRepository<User> {
    * Create a new user
    */
   async createNewUser(body: CreateUserDto) {
-    const userInstance = this.create(body);
-    const id = await this.insert(userInstance); // TODO: password not save correctly
-    return { id };
+    const user = this.create(body);
+    await this.em.persistAndFlush(user);
+    return { id: user.id };
   }
 }

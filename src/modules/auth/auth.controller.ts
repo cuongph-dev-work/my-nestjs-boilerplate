@@ -9,15 +9,15 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Public()
+  @Version('1')
   @UseGuards(LocalAuthGuard)
   @Post('sign-in')
-  @Version('1')
   signIn(@Req() req: RequestWithUser) {
     return this.authService.signIn(req.user);
   }
 
-  @Get('user-info')
   @Version('1')
+  @Get('user-info')
   userInfo(@Req() req: RequestWithUser) {
     return this.authService.userInfo(req.user);
   }

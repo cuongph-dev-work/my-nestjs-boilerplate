@@ -8,7 +8,6 @@ import {
   BaseEntity,
   BeforeCreate,
   Opt,
-  Hidden,
 } from '@mikro-orm/core';
 import { generateRandomId } from '@utils/helper';
 import * as bcrypt from 'bcryptjs';
@@ -27,7 +26,7 @@ export class User extends BaseEntity {
   /**
    * Primary key identifier for the user
    */
-  @PrimaryKey()
+  @PrimaryKey({ columnType: 'varchar', length: 20 })
   id: string = generateRandomId();
 
   /**

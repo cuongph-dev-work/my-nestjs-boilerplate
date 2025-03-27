@@ -4,11 +4,7 @@ import { AppModule } from './app.module';
 import compression from 'compression';
 import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import {
-  i18nValidationErrorFactory,
-  I18nService,
-  I18nValidationPipe,
-} from 'nestjs-i18n';
+import { I18nService } from 'nestjs-i18n';
 import { useContainer } from 'class-validator';
 import { HttpExceptionFilter } from './filters/http-exception.filter';
 import helmet from 'helmet';

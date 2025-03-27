@@ -39,8 +39,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
       message = this.i18n.t('app.http.unprocessableEntity');
       const resErrors = exception.getResponse().message;
       if (resErrors instanceof Array) {
-        console.log(resErrors);
-
         errors = this.translateErrors(resErrors, lang);
       }
     } else {
@@ -81,7 +79,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       path: request.url,
       method: request.method,
       message: message,
-      ...(errors && { errors }),
+      ...(errors.length > 0 && { errors }),
       ...(this.configService.get('app.nodeEnv') === 'development' && {
         stack: exception instanceof Error ? exception.stack : undefined,
       }),

@@ -56,6 +56,11 @@ export function transformValidationErrors(
   );
 }
 
+interface IError {
+  property: string;
+  key: string;
+  params: any;
+}
 /**
  * Transforms a validation error into a structured format
  * @param property The property of the validation error
@@ -64,22 +69,24 @@ export function transformValidationErrors(
  * @returns An object with the key and constraints
  */
 export function transformToValidationError(
-  property: string,
-  key: string,
-  params: any = {},
+  errors: IError[],
   i18n: I18nService,
 ) {
-  const error = new ValidationError();
-  error.property = property;
-  error.constraints = {
-    isUnique: JSON.stringify({
-      key,
-      params,
-    }),
-  };
+  const message: ValidationError[] = errors.map((error) => {
+    const newError = new ValidationError();
+    newError.property = error.property;
+    newError.constraints = {
+      [error.key]: JSON.stringify({
+        key: error.key,
+        params: error.params,
+      }),
+    };
+    return newError;
+  });
+
   return new UnprocessableEntityException({
     error: i18n.t('app.http.unprocessableEntity'),
     statusCode: HttpStatus.UNPROCESSABLE_ENTITY,
-    message: [error],
+    message,
   });
 }
