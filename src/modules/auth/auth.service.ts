@@ -15,7 +15,6 @@ import { UserInfoResponseDto } from './dtos/user-info-response.dto';
 
 @Injectable()
 export class AuthService {
-  private SALT_ROUND = 11;
   private MAX_FAILED_ATTEMPTS = 10;
   private ATTEMPTS_WINDOW_MINUTES = 30;
   private BLOCK_DURATION_HOURS = 2;
@@ -70,12 +69,12 @@ export class AuthService {
    * @returns Authenticated user entity
    */
   async getAuthenticatedUser(email: string, password: string) {
-    const user = await this.userService.findByEmail(email);
+    const user = await this.userService.findByEmailWithPassword(email);
     if (!user) {
       throw new UnauthorizedException(this.i18n.t('message.wrong_account'));
     }
-
     const is_matching = await bcrypt.compare(password, user.password);
+
     if (!is_matching) {
       throw new UnauthorizedException(this.i18n.t('message.wrong_account'));
     }

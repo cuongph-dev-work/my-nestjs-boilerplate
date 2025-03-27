@@ -2,5 +2,6 @@
   "wrong_account": "Tài khoản hoặc mật khẩu không đúng.",
   "login_attempts_exceeded": "Tài khoản của bạn đã tạm thời bị khóa trong 2 giờ do nhiều lần đăng nhập không thành công. Vui lòng thử lại sau hoặc liên hệ hỗ trợ.",
   "token_expired": "Mã đã hết hạn sử dụng.",
-  "account_blocked": "Tài khoản của bạn đã bị khóa đến {time}."
+  "account_blocked": "Tài khoản của bạn đã bị khóa đến {time}.",
+  "user_not_found": "Không tìm thấy thông tin người dùng."
 }

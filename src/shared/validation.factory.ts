@@ -1,13 +1,15 @@
-import { ValidationError } from '@nestjs/common';
+import { UnprocessableEntityException, ValidationError } from '@nestjs/common';
 
 type ErrorMessage = {
   path: string[] | string;
   messages: string[];
 };
 
-export function formatErrors(errors: ValidationError[]): ErrorMessage[] {
-  return errors.flatMap((error) => formatError(error, []));
-}
+export const ValidationErrorFactory = (errors: ValidationError[]) => {
+  errors.flatMap((error) => formatError(error, []));
+
+  throw new UnprocessableEntityException(errors);
+};
 
 function formatError(
   error: ValidationError,

@@ -5,19 +5,20 @@ import {
   MaxLength,
   IsEmail,
   IsUrl,
-  IsPhoneNumber,
-  Matches,
   IsNotEmpty,
   IsNumberString,
   ValidateBy,
   ValidationArguments,
+  IsOptional,
+  ValidateIf,
 } from 'class-validator';
-import { i18nValidationMessage } from 'nestjs-i18n';
 import { applyDecorators } from '@nestjs/common';
 import * as ValidatorJS from 'validator';
 import { Trim } from '@decorators/transform.decorator';
 import { ConfigService } from '@nestjs/config';
 import configs from '@configs/app';
+import { isEmpty, isNil } from 'lodash';
+import { transformValidationErrors } from '@utils/helper';
 
 const configService = new ConfigService(configs());
 
@@ -25,6 +26,7 @@ interface IStringValidationOption {
   min?: number;
   max?: number;
   trim?: boolean;
+  isOptional?: boolean;
   allowEmpty?: boolean;
   isEmail?: boolean;
   isPhone?: boolean;
@@ -38,13 +40,14 @@ interface IStringValidationOption {
 }
 
 export const StringField = (
-  options?: IStringValidationOption,
+  options: Partial<IStringValidationOption> = {},
   validationOptions?: ValidationOptions,
 ): PropertyDecorator => {
   const {
     min,
     max,
     trim,
+    isOptional,
     allowEmpty,
     isEmail,
     isPhone,
@@ -54,16 +57,23 @@ export const StringField = (
     emailOptions,
     urlOptions,
     numericOptions,
-    phoneOptions,
+    phoneOptions = {
+      defaultCountry: 'VN',
+    },
   } = options || {};
 
   const decorators = [
+    ...(isOptional
+      ? [
+          IsOptional(),
+          ValidateIf((_, value) => {
+            return !isNil(value) && !isEmpty(value);
+          }),
+        ]
+      : []),
     IsString({
       message:
-        validationOptions?.message ||
-        i18nValidationMessage('validation.string', {
-          property: '$property',
-        }),
+        validationOptions?.message || transformValidationErrors('IsString', {}),
       ...validationOptions,
     }),
   ];
@@ -75,9 +85,7 @@ export const StringField = (
   if (!allowEmpty) {
     decorators.push(
       IsNotEmpty({
-        message: i18nValidationMessage('validation.IsNotEmpty', {
-          property: '$property',
-        }),
+        message: transformValidationErrors('IsNotEmpty', {}),
       }),
     );
   }
@@ -85,9 +93,8 @@ export const StringField = (
   if (min) {
     decorators.push(
       MinLength(min, {
-        message: i18nValidationMessage('validation.MinLength', {
-          property: '$property',
-          constraints: [min],
+        message: transformValidationErrors('MinLength', {
+          min,
         }),
       }),
     );
@@ -96,9 +103,8 @@ export const StringField = (
   if (max) {
     decorators.push(
       MaxLength(max, {
-        message: i18nValidationMessage('validation.MaxLength', {
-          property: '$property',
-          constraints: [max],
+        message: transformValidationErrors('MaxLength', {
+          max,
         }),
       }),
     );
@@ -107,9 +113,7 @@ export const StringField = (
   if (isEmail) {
     decorators.push(
       IsEmail(emailOptions, {
-        message: i18nValidationMessage('validation.IsEmail', {
-          property: '$property',
-        }),
+        message: transformValidationErrors('IsEmail', {}),
       }),
     );
   }
@@ -117,27 +121,19 @@ export const StringField = (
   if (isUrl) {
     decorators.push(
       IsUrl(urlOptions, {
-        message: i18nValidationMessage('validation.IsUrl', {
-          property: '$property',
-        }),
+        message: transformValidationErrors('IsUrl', {}),
       }),
     );
   }
 
   if (isPhone) {
-    decorators.push(
-      IsPhoneNumber(phoneOptions, {
-        message: i18nValidationMessage('validation.IsPhoneNumber', {
-          property: '$property',
-        }),
-      }),
-    );
+    decorators.push(IsPhoneNumber());
   }
 
   if (isPassword) {
     decorators.push(
       IsPassword({
-        message: i18nValidationMessage('validation.IsPassword'),
+        message: transformValidationErrors('IsPassword', {}),
       }),
     );
   }
@@ -145,7 +141,7 @@ export const StringField = (
   if (isNumberString) {
     decorators.push(
       IsNumberString(numericOptions, {
-        message: i18nValidationMessage('validation.IsNumber'),
+        message: transformValidationErrors('IsNumber', {}),
       }),
     );
   }
@@ -172,6 +168,25 @@ const IsPassword = (
           }
           const regex = new RegExp(passwordPattern);
           return regex.test(value);
+        },
+      },
+    },
+    validationOptions,
+  );
+};
+
+const IsPhoneNumber = (
+  validationOptions?: ValidationOptions,
+): PropertyDecorator => {
+  return ValidateBy(
+    {
+      name: 'IsPhoneNumber',
+      validator: {
+        validate(value: string) {
+          return ValidatorJS.isMobilePhone(value, 'vi-VN');
+        },
+        defaultMessage: () => {
+          return transformValidationErrors('IsPhoneNumber', {});
         },
       },
     },

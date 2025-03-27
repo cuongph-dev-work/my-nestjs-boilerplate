@@ -95,6 +95,9 @@ importers:
       luxon:
         specifier: ^3.6.0
         version: 3.6.0
+      nanoid:
+        specifier: ^5.1.5
+        version: 5.1.5
       nestjs-i18n:
         specifier: ^10.5.1
         version: 10.5.1(@nestjs/common@11.0.12(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.0.12)(class-validator@0.14.1)(rxjs@7.8.2)
@@ -3113,6 +3116,11 @@ packages:
   mute-stream@2.0.0:
     resolution: {integrity: sha512-WWdIxpyjEn+FhQJQQv9aQAYlHoNVdzIzUySNV1gHUPDSdZJ3yZn7pAAbQcV7B56Mvu881q9FZV+0Vx2xC44VWA==}
     engines: {node: ^18.17.0 || >=20.5.0}
+
+  nanoid@5.1.5:
+    resolution: {integrity: sha512-Ir/+ZpE9fDsNH0hQ3C68uyThDXzYcim2EqcZ8zn8Chtt1iylPT9xXJB0kPCnqzgcEGikO9RxSrh63MsmVCU7Fw==}
+    engines: {node: ^18 || >=20}
+    hasBin: true
 
   natural-compare@1.4.0:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
@@ -7485,6 +7493,8 @@ snapshots:
       xtend: 4.0.2
 
   mute-stream@2.0.0: {}
+
+  nanoid@5.1.5: {}
 
   natural-compare@1.4.0: {}
 

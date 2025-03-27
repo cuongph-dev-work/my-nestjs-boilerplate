@@ -24,7 +24,6 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   async validate(req: Request & { clientIp: string }) {
     const body = plainToClass(SignInDTO, req.body);
     const errors = await classValidate(body);
-    console.log(errors);
     if (errors.length) {
       throw new BadRequestException(this.i18n.t('message.wrong_account'));
     } else {

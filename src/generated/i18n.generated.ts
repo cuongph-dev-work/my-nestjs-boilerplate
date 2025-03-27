@@ -13,13 +13,27 @@ export type I18nTranslations = {
         "http.internalServerError": string;
         "http.unprocessableEntity": string;
     };
-    "messages": {
+    "message": {
         "wrong_account": string;
         "login_attempts_exceeded": string;
         "token_expired": string;
         "account_blocked": string;
+        "user_not_found": string;
     };
     "validation": {
+        "label": {
+            "email": string;
+            "password": string;
+            "phone": string;
+            "name": string;
+            "address": string;
+            "city": string;
+            "country": string;
+            "role": string;
+            "last_name": string;
+            "middle_name": string;
+            "first_name": string;
+        };
         "IsString": string;
         "IsNotEmpty": string;
         "MinLength": string;

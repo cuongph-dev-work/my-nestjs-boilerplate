@@ -18,6 +18,7 @@ import modules from './modules';
 import { join } from 'path';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAccessTokenGuard } from '@modules/auth/guards/jwt-access-token.guard';
+import { RolesGuard } from '@guards/roles.guard';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -79,6 +80,10 @@ import { JwtAccessTokenGuard } from '@modules/auth/guards/jwt-access-token.guard
     {
       provide: APP_GUARD,
       useClass: JwtAccessTokenGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
     },
   ],
 })

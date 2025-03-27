@@ -1,5 +1,5 @@
 export class TokenPayload {
-  sub: number; // subject (user ID)
+  sub: string; // subject (user ID)
   email: string;
   role: string;
   iat?: number; // issued at

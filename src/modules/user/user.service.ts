@@ -1,47 +1,66 @@
 import {
-  ConflictException,
+  forwardRef,
+  HttpStatus,
+  Inject,
   Injectable,
   NotFoundException,
+  UnprocessableEntityException,
 } from '@nestjs/common';
-import { EntityManager, FilterQuery } from '@mikro-orm/core';
-import { InjectRepository } from '@mikro-orm/nestjs';
-import { EntityRepository } from '@mikro-orm/postgresql';
 import { User } from '../../database/entities/user.entity';
-import { CreateUserDto, UpdateUserDto } from './dtos';
-import * as bcrypt from 'bcryptjs';
-import { USER_ROLE } from '../../configs/enum/user';
 import { I18nService } from 'nestjs-i18n';
+import { UserRepository } from './user.repository';
+import { CreateUserDto, ShowUserResponseDto } from './dtos';
+import { plainToInstance } from 'class-transformer';
+import { ValidationError } from 'class-validator';
+import { transformToValidationError } from '@utils/helper';
 
 @Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(User)
-    private readonly userRepository: EntityRepository<User>,
-    private readonly em: EntityManager,
+    @Inject(forwardRef(() => UserRepository))
+    private readonly userRepository: UserRepository,
     private readonly i18n: I18nService,
   ) {}
+
+  private async checkUniqueEmail(email: string) {
+    const user = await this.userRepository.findByEmail(email, []);
+    if (user) {
+      throw transformToValidationError('email', 'IsUnique', {}, this.i18n);
+    }
+  }
 
   /**
    * Find a user by email
    */
-  async findByEmail(email: string): Promise<User | null> {
-    return this.userRepository.findOne(
-      { email },
-      {
-        filters: ['isActive'],
-      },
-    );
+  async findByEmailWithPassword(email: string): Promise<User | null> {
+    return this.userRepository.findByEmail(email, ['password']);
   }
 
   /**
    * Find a user by ID
    */
-  async findById(id: number): Promise<User | null> {
-    return this.userRepository.findOne(
-      { id },
-      {
-        filters: ['isActive'],
-      },
-    );
+  async findById(id: string): Promise<User | null> {
+    return this.userRepository.findById(id);
+  }
+
+  /**
+   * Create a new user
+   */
+  async createUser(body: CreateUserDto) {
+    // check unique email
+    await this.checkUniqueEmail(body.email);
+    // create user
+    return this.userRepository.createNewUser(body);
+  }
+
+  /**
+   * Get user by id
+   */
+  async getUserById(id: string): Promise<ShowUserResponseDto> {
+    const user = await this.userRepository.findById(id);
+    if (!user) {
+      throw new NotFoundException(this.i18n.t('message.user_not_found'));
+    }
+    return plainToInstance(ShowUserResponseDto, user);
   }
 }

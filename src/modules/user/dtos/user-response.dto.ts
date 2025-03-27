@@ -2,7 +2,7 @@ import { USER_ROLE } from '../../../configs/enum/user';
 import { Exclude, Expose, Type } from 'class-transformer';
 
 @Exclude()
-export class UserResponseDto {
+export class ShowUserResponseDto {
   @Expose()
   id: number;
 
@@ -17,6 +17,9 @@ export class UserResponseDto {
 
   @Expose()
   last_name?: string;
+
+  @Expose()
+  full_name?: string;
 
   @Expose()
   phone?: string;

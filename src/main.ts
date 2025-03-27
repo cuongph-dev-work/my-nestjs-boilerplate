@@ -1,17 +1,18 @@
+import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import compression from 'compression';
 import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
-import { formatErrors } from '@utils/format-error-http';
 import { ConfigService } from '@nestjs/config';
 import {
-  I18nValidationExceptionFilter,
   i18nValidationErrorFactory,
   I18nService,
+  I18nValidationPipe,
 } from 'nestjs-i18n';
 import { useContainer } from 'class-validator';
 import { HttpExceptionFilter } from './filters/http-exception.filter';
 import helmet from 'helmet';
+import { ValidationErrorFactory } from '@shared/validation.factory';
 
 async function bootstrap() {
   const logger = new Logger(bootstrap.name);
@@ -23,7 +24,9 @@ async function bootstrap() {
   app.use(helmet());
   app.useLogger(app.get(Logger));
   app.enableVersioning({
-    type: VersioningType.URI,
+    type: VersioningType.HEADER,
+    header: 'version',
+    defaultVersion: '1',
   });
   app.setGlobalPrefix('/api');
   app.enableCors();
@@ -32,17 +35,15 @@ async function bootstrap() {
 
   app.useGlobalPipes(
     new ValidationPipe({
-      exceptionFactory: i18nValidationErrorFactory,
+      exceptionFactory: ValidationErrorFactory,
       whitelist: true,
       stopAtFirstError: true,
+      errorHttpStatusCode: 422,
+      transform: true,
     }),
   );
 
   app.useGlobalFilters(
-    new I18nValidationExceptionFilter({
-      errorFormatter: formatErrors,
-      errorHttpStatusCode: 422,
-    }),
     new HttpExceptionFilter(app.get(ConfigService), app.get(I18nService)),
   );
 

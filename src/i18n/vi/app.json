@@ -1,9 +1,9 @@
 {
-  "http.badRequest": "bad request",
-  "http.unauthorized": "unauthorized",
-  "http.forbidden": "forbidden",
-  "http.notFound": "not found",
-  "http.internalServerError": "internal server error",
-  "http.unprocessableEntity": "unprocessable entity"
+  "http.badRequest": "Bad Request",
+  "http.unauthorized": "Unauthorized",
+  "http.forbidden": "Forbidden",
+  "http.notFound": "Not Found",
+  "http.internalServerError": "Internal Server Error",
+  "http.unprocessableEntity": "Unprocessable Entity"
 }
   
