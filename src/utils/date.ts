@@ -185,3 +185,48 @@ export const getHumanReadableTimeDifference = (
     : DateTime.fromJSDate(date);
   return luxonDate.toRelative() || '';
 };
+
+/**
+ * Get current date
+ * @returns DateTime object
+ */
+export const getNow = (): DateTime => {
+  return DateTime.now();
+};
+
+/**
+ * Get current date in UTC
+ * @returns DateTime object
+ */
+export const getNowInUTC = (): DateTime => {
+  return DateTime.now().setZone('UTC');
+};
+
+/**
+ * Add minutes to a date
+ * @param date Date to add minutes to
+ * @param minutes Number of minutes to add
+ * @returns DateTime object
+ */
+export const addMinutes = (
+  date: Date | DateTime,
+  minutes: number,
+): DateTime => {
+  const luxonDate = DateTime.isDateTime(date)
+    ? date
+    : DateTime.fromJSDate(date);
+  return luxonDate.plus({ minutes });
+};
+
+/**
+ * Add hours to a date
+ * @param date Date to add hours to
+ * @param hours Number of hours to add
+ * @returns DateTime object
+ */
+export const addHours = (date: Date | DateTime, hours: number): DateTime => {
+  const luxonDate = DateTime.isDateTime(date)
+    ? date
+    : DateTime.fromJSDate(date);
+  return luxonDate.plus({ hours });
+};

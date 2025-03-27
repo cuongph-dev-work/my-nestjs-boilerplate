@@ -4,10 +4,11 @@ import {
   FilterQuery,
   FindOptions,
   Populate,
+  wrap,
 } from '@mikro-orm/core';
 import { EntityManager } from '@mikro-orm/postgresql';
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dtos';
+import { CreateUserDto, UpdateUserDto } from './dtos';
 
 @Injectable()
 export class UserRepository extends EntityRepository<User> {
@@ -35,8 +36,11 @@ export class UserRepository extends EntityRepository<User> {
    * @param id The ID of the user to find
    * @returns The user if found, null otherwise
    */
-  async findById(id: string): Promise<User | null> {
-    return this.findOne({ id }, { filters: ['isActive'] });
+  async findById(
+    id: string,
+    populate?: Populate<User, 'password'>,
+  ): Promise<User | null> {
+    return this.findOne({ id }, { filters: ['isActive'], populate: populate });
   }
 
   /**
@@ -55,6 +59,55 @@ export class UserRepository extends EntityRepository<User> {
   async createNewUser(body: CreateUserDto) {
     const user = this.create(body);
     await this.em.persistAndFlush(user);
+    return { id: user.id };
+  }
+
+  /**
+   * Update user
+   */
+  async updateUser(user: User, body: UpdateUserDto) {
+    wrap(user).assign(body, {
+      merge: true,
+    });
+    await this.em.flush();
+    return { id: user.id };
+  }
+
+  /**
+   * Delete user
+   */
+  async deleteUser(user: User) {
+    wrap(user).assign(
+      {
+        deleted_at: new Date(),
+      },
+      {
+        merge: true,
+      },
+    );
+    await this.em.flush();
+  }
+
+  /**
+   * Update password
+   */
+  async updatePassword(user: User, newPassword: string) {
+    user.password = newPassword;
+    await this.em.flush();
+    return { id: user.id };
+  }
+
+  /**
+   * Update reset token
+   */
+  async updateResetToken(
+    user: User,
+    resetToken: string,
+    resetTokenExpiredAt: Date,
+  ) {
+    user.reset_token = resetToken;
+    user.reset_token_expired_at = resetTokenExpiredAt;
+    await this.em.flush();
     return { id: user.id };
   }
 }

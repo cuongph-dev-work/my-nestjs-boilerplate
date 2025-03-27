@@ -19,6 +19,10 @@ export type I18nTranslations = {
         "token_expired": string;
         "account_blocked": string;
         "user_not_found": string;
+        "password_incorrect": string;
+        "reset_password_success": string;
+        "invalid_reset_token": string;
+        "set_first_password_success": string;
     };
     "validation": {
         "label": {
@@ -33,6 +37,10 @@ export type I18nTranslations = {
             "last_name": string;
             "middle_name": string;
             "first_name": string;
+            "new_password": string;
+            "new_password_confirmation": string;
+            "current_password": string;
+            "token": string;
         };
         "IsString": string;
         "IsNotEmpty": string;
@@ -60,6 +68,7 @@ export type I18nTranslations = {
         "ArrayMaxSize": string;
         "ArrayMinSize": string;
         "IsEqualTo": string;
+        "IsSameAs": string;
         "IsPassword": string;
         "IsMatch": string;
         "IsArray": string;

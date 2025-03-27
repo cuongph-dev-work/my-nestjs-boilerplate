@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   forwardRef,
   Inject,
   Injectable,
@@ -7,9 +8,21 @@ import {
 import { User } from '../../database/entities/user.entity';
 import { I18nService } from 'nestjs-i18n';
 import { UserRepository } from './user.repository';
-import { CreateUserDto, ShowUserResponseDto } from './dtos';
+import {
+  CreateUserDto,
+  SearchUserDto,
+  ShowUserResponseDto,
+  UpdateUserDto,
+} from './dtos';
 import { plainToInstance } from 'class-transformer';
-import { transformToValidationError } from '@utils/helper';
+import { generateToken, transformToValidationError } from '@utils/helper';
+import { compare } from 'bcryptjs';
+import {
+  ChangePasswordDto,
+  ResetPasswordDto,
+  SetFirstPasswordDto,
+} from '@modules/auth/dtos';
+import { addHours } from '@utils/date';
 
 @Injectable()
 export class UserService {
@@ -62,5 +75,128 @@ export class UserService {
       throw new NotFoundException(this.i18n.t('message.user_not_found'));
     }
     return plainToInstance(ShowUserResponseDto, user);
+  }
+
+  /**
+   * Update user
+   */
+  async updateUser(id: string, body: UpdateUserDto) {
+    const user = await this.userRepository.findById(id);
+    if (!user) {
+      throw new NotFoundException(this.i18n.t('message.user_not_found'));
+    }
+    return this.userRepository.updateUser(user, body);
+  }
+
+  /**
+   * Delete user
+   */
+  async deleteUser(id: string) {
+    const user = await this.userRepository.findById(id);
+    if (!user) {
+      throw new NotFoundException(this.i18n.t('message.user_not_found'));
+    }
+    return this.userRepository.deleteUser(user);
+  }
+
+  /**
+   * Get users
+   */
+  getUsers(query: SearchUserDto) {
+    console.log(query);
+    // return this.userRepository.getUsers(query);
+  }
+
+  /**
+   * Change password
+   */
+  async changePassword(body: ChangePasswordDto, currentUser: User) {
+    const { current_password } = body;
+    const user = await this.userRepository.findById(currentUser.id, [
+      'password',
+    ]);
+
+    // check if user exists
+    if (!user) {
+      throw new NotFoundException(this.i18n.t('message.user_not_found'));
+    }
+
+    // check if user has password
+    if (!user.password) {
+      throw new BadRequestException(this.i18n.t('message.user_not_found'));
+    }
+
+    // check current password
+    const isMatch = await compare(current_password, user.password);
+    if (!isMatch) {
+      throw new BadRequestException(this.i18n.t('message.password_incorrect'));
+    }
+
+    return this.userRepository.updatePassword(user, body.new_password);
+  }
+
+  /**
+   * Reset password
+   */
+  async resetPassword(body: ResetPasswordDto) {
+    const { email } = body;
+    const user = await this.userRepository.findByEmail(email, []);
+    if (!user) {
+      throw new NotFoundException(this.i18n.t('message.user_not_found'));
+    }
+
+    const resetToken = generateToken();
+    const resetTokenExpiredAt = addHours(new Date(), 3);
+
+    await this.userRepository.updateResetToken(
+      user,
+      resetToken,
+      resetTokenExpiredAt.toJSDate(),
+    );
+
+    // TODO: Send email to user
+
+    return {
+      message: this.i18n.t('message.reset_password_success'),
+    };
+  }
+
+  /**
+   * Verify reset token
+   */
+  async verifyResetToken(token: string) {
+    const user = await this.userRepository.findOne({
+      reset_token: token,
+      reset_token_expired_at: { $gte: new Date() },
+    });
+
+    if (!user) {
+      throw new BadRequestException(this.i18n.t('message.invalid_reset_token'));
+    }
+
+    return {
+      id: user.id,
+    };
+  }
+
+  /**
+   * Set first password
+   */
+  async setFirstPassword(body: SetFirstPasswordDto) {
+    const { token, password } = body;
+    const user = await this.userRepository.findOne({
+      reset_token: token,
+      reset_token_expired_at: { $gte: new Date() },
+    });
+
+    if (!user) {
+      throw new BadRequestException(this.i18n.t('message.invalid_reset_token'));
+    }
+
+    await this.userRepository.updatePassword(user, password);
+
+    return {
+      message: this.i18n.t('message.set_first_password_success'),
+    };
   }
 }

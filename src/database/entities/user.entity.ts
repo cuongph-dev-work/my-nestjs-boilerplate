@@ -8,6 +8,7 @@ import {
   BaseEntity,
   BeforeCreate,
   Opt,
+  BeforeUpdate,
 } from '@mikro-orm/core';
 import { generateRandomId } from '@utils/helper';
 import * as bcrypt from 'bcryptjs';
@@ -50,7 +51,7 @@ export class User extends BaseEntity {
   /**
    * Expiration date for the reset token
    */
-  @Property({ nullable: true })
+  @Property({ nullable: true, columnType: 'timestamp with time zone' })
   reset_token_expired_at: Opt<Date>;
 
   /**
@@ -100,14 +101,14 @@ export class User extends BaseEntity {
   /**
    * Date until which the user is blocked/suspended
    */
-  @Property({ nullable: true })
+  @Property({ nullable: true, columnType: 'timestamp with time zone' })
   block_to: Opt<Date>;
 
   /**
    * Timestamp when the user record was created
    * Automatically set to current date when record is created
    */
-  @Property()
+  @Property({ columnType: 'timestamp with time zone' })
   created_at: Opt<Date> = new Date();
 
   /**
@@ -115,14 +116,17 @@ export class User extends BaseEntity {
    * Automatically set to current date on update
    */
 
-  @Property({ onUpdate: () => new Date() })
+  @Property({
+    onUpdate: () => new Date(),
+    columnType: 'timestamp with time zone',
+  })
   updated_at: Opt<Date> = new Date();
 
   /**
    * Soft delete timestamp, null for active users
    * When set, indicates the user has been deleted
    */
-  @Property({ nullable: true })
+  @Property({ nullable: true, columnType: 'timestamp with time zone' })
   deleted_at: Opt<Date>;
 
   /**
@@ -140,5 +144,15 @@ export class User extends BaseEntity {
   @BeforeCreate()
   async beforeCreate() {
     this.password = await User.hashPassword(this.password);
+  }
+
+  /**
+   * Hash the password before updating a user
+   */
+  @BeforeUpdate()
+  async beforeUpdate() {
+    if (this.password) {
+      this.password = await User.hashPassword(this.password);
+    }
   }
 }

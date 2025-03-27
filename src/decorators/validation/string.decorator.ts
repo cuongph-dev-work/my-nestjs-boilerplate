@@ -14,7 +14,7 @@ import {
 } from 'class-validator';
 import { applyDecorators } from '@nestjs/common';
 import * as ValidatorJS from 'validator';
-import { Trim } from '@decorators/transform.decorator';
+import { ToInt, Trim } from '@decorators/transform.decorator';
 import { ConfigService } from '@nestjs/config';
 import configs from '@configs/app';
 import { isEmpty, isNil } from 'lodash';
@@ -33,10 +33,12 @@ interface IStringValidationOption {
   isUrl?: boolean;
   isPassword?: boolean;
   isNumberString?: boolean;
+  isSame?: string;
   emailOptions?: ValidatorJS.IsEmailOptions;
   urlOptions?: ValidatorJS.IsURLOptions;
   numericOptions?: ValidatorJS.IsNumericOptions;
   phoneOptions?: ValidatorJS.IsPhoneNumberOptions;
+  toInt?: boolean;
 }
 
 export const StringField = (
@@ -54,12 +56,14 @@ export const StringField = (
     isUrl,
     isPassword,
     isNumberString,
+    isSame,
     emailOptions,
     urlOptions,
     numericOptions,
     phoneOptions = {
       defaultCountry: 'VN',
     },
+    toInt,
   } = options || {};
 
   const decorators = [
@@ -146,6 +150,20 @@ export const StringField = (
     );
   }
 
+  if (isSame) {
+    decorators.push(
+      IsSameAs(isSame, {
+        message: transformValidationErrors('IsSameAs', {
+          properties: [isSame],
+        }),
+      }),
+    );
+  }
+
+  if (toInt) {
+    decorators.push(ToInt());
+  }
+
   return applyDecorators(...decorators);
 };
 
@@ -187,6 +205,30 @@ const IsPhoneNumber = (
         },
         defaultMessage: () => {
           return transformValidationErrors('IsPhoneNumber', {});
+        },
+      },
+    },
+    validationOptions,
+  );
+};
+
+const IsSameAs = (
+  property: string,
+  validationOptions?: ValidationOptions,
+): PropertyDecorator => {
+  return ValidateBy(
+    {
+      name: 'IsSameAs',
+      validator: {
+        validate(value: string, args: ValidationArguments) {
+          const object = args.object as any;
+          const relatedValue = object[property];
+          return value === relatedValue;
+        },
+        defaultMessage() {
+          return transformValidationErrors('IsSameAs', {
+            properties: [property],
+          });
         },
       },
     },

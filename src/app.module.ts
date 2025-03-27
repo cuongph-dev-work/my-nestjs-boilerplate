@@ -19,6 +19,7 @@ import { join } from 'path';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAccessTokenGuard } from '@modules/auth/guards/jwt-access-token.guard';
 import { RolesGuard } from '@guards/roles.guard';
+import { JwtModule } from '@nestjs/jwt';
 @Module({
   imports: [
     ConfigModule.forRoot({

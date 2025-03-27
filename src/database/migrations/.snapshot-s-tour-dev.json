@@ -48,13 +48,13 @@
         },
         "reset_token_expired_at": {
           "name": "reset_token_expired_at",
-          "type": "varchar(255)",
+          "type": "timestamp with time zone",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
-          "length": 255,
-          "mappedType": "string"
+          "length": 6,
+          "mappedType": "datetime"
         },
         "avatar_url": {
           "name": "avatar_url",
@@ -125,17 +125,17 @@
         },
         "block_to": {
           "name": "block_to",
-          "type": "varchar(255)",
+          "type": "timestamp with time zone",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
-          "length": 255,
-          "mappedType": "string"
+          "length": 6,
+          "mappedType": "datetime"
         },
         "created_at": {
           "name": "created_at",
-          "type": "timestamptz",
+          "type": "timestamp with time zone",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -145,7 +145,7 @@
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "timestamptz",
+          "type": "timestamp with time zone",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -155,13 +155,13 @@
         },
         "deleted_at": {
           "name": "deleted_at",
-          "type": "varchar(255)",
+          "type": "timestamp with time zone",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
-          "length": 255,
-          "mappedType": "string"
+          "length": 6,
+          "mappedType": "datetime"
         }
       },
       "name": "user",

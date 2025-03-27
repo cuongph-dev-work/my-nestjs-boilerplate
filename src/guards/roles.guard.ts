@@ -1,31 +1,30 @@
+import { Roles } from '@decorators/role.decorator';
 import {
   CanActivate,
   ExecutionContext,
-  Logger,
-  UnauthorizedException,
+  ForbiddenException,
+  Injectable,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { JwtService } from '@nestjs/jwt';
 import { I18nService } from 'nestjs-i18n';
-import { Observable } from 'rxjs';
 
+@Injectable()
 export class RolesGuard implements CanActivate {
-  private logger = new Logger(RolesGuard.name);
-
   constructor(
     private reflector: Reflector,
-    private readonly jwtService: JwtService,
     private readonly i18n: I18nService,
   ) {}
 
-  canActivate(
-    context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
+  canActivate(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest();
-    const user = request.user;
-    // if (user.role !== USER_ROLE.SALE) {
-    //   throw new UnauthorizedException();
-    // }
+    const roles = this.reflector.get(Roles, context.getHandler());
+    if (!roles || !roles.length || !request.user) {
+      return true;
+    }
+    const isMatch = roles.some((role) => role === request.user.role);
+    if (!isMatch) {
+      throw new ForbiddenException(this.i18n.t('app.http.forbidden'));
+    }
     return true;
   }
 }

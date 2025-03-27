@@ -56,6 +56,10 @@ export function ToDateISOString(): PropertyDecorator {
 export function ToInt(): PropertyDecorator {
   return Transform(
     (params) => {
+      if (isNil(params.value)) {
+        return;
+      }
+
       const value = params.value as string;
       return Number.parseInt(value, 10);
     },
@@ -139,31 +143,4 @@ export function ToArray(): PropertyDecorator {
     },
     { toClassOnly: true },
   );
-}
-
-export function IsEqualTo<T>(
-  property: keyof T,
-  validationOptions?: ValidationOptions,
-) {
-  return (object: any, propertyName: string) => {
-    registerDecorator({
-      name: 'IsEqualTo',
-      target: object.constructor,
-      propertyName,
-      constraints: [property],
-      options: validationOptions,
-      validator: {
-        validate(value: any, args: ValidationArguments) {
-          const [relatedPropertyName] = args.constraints;
-          const relatedValue = (args.object as any)[relatedPropertyName];
-          return value === relatedValue;
-        },
-
-        defaultMessage(args: ValidationArguments) {
-          const [relatedPropertyName] = args.constraints;
-          return `${propertyName} must match ${relatedPropertyName} exactly`;
-        },
-      },
-    });
-  };
 }

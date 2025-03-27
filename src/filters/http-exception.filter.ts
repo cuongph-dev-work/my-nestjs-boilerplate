@@ -105,6 +105,18 @@ export class HttpExceptionFilter implements ExceptionFilter {
         },
       );
 
+      if (params.properties) {
+        let i = 1;
+        for (const p of params.properties) {
+          params[`property${i}`] = this.i18n
+            .t(`validation.label.${p}`, {
+              lang,
+            })
+            .toLowerCase();
+          i++;
+        }
+      }
+
       return {
         path: error.property,
         messages: this.i18n.t(`validation.${key}`, {

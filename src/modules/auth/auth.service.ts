@@ -11,8 +11,12 @@ import { I18nService } from 'nestjs-i18n';
 import * as bcrypt from 'bcryptjs';
 import { User } from 'src/database/entities/user.entity';
 import { plainToInstance } from 'class-transformer';
-import { UserInfoResponseDto } from './dtos/user-info-response.dto';
-
+import {
+  ChangePasswordDto,
+  ResetPasswordDto,
+  SetFirstPasswordDto,
+  UserInfoResponseDto,
+} from './dtos';
 @Injectable()
 export class AuthService {
   private MAX_FAILED_ATTEMPTS = 10;
@@ -114,5 +118,26 @@ export class AuthService {
    */
   userInfo(user: User): UserInfoResponseDto {
     return plainToInstance(UserInfoResponseDto, user);
+  }
+
+  /**
+   * Change password
+   */
+  changePassword(body: ChangePasswordDto, user: User) {
+    return this.userService.changePassword(body, user);
+  }
+
+  /**
+   * Reset password
+   */
+  resetPassword(body: ResetPasswordDto) {
+    return this.userService.resetPassword(body);
+  }
+
+  /**
+   * Set first password
+   */
+  setFirstPassword(body: SetFirstPasswordDto) {
+    return this.userService.setFirstPassword(body);
   }
 }

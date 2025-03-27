@@ -14,7 +14,7 @@ A NestJS-based API for the S-Tour application.
 
 ```bash
 # Install dependencies
-npm install
+pnpm install
 ```
 
 ## Docker Setup
@@ -22,6 +22,9 @@ npm install
 The project uses Docker Compose for managing development services. Start the required services:
 
 ```bash
+# Build all services
+docker-compose build
+
 # Start all services
 docker-compose up -d
 

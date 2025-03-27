@@ -1,28 +1,27 @@
 import { StringField } from '@decorators/validation/string.decorator';
 
-export class UpdateUserDto {
+export class SearchUserDto {
   @StringField({
     isOptional: true,
-    max: 255,
   })
-  first_name: string;
+  email?: string;
 
   @StringField({
     isOptional: true,
-    max: 255,
   })
-  middle_name: string;
+  phone?: string;
 
   @StringField({
     isOptional: true,
-    max: 255,
+    isNumberString: true,
+    toInt: true,
   })
-  last_name: string;
+  page?: number;
 
   @StringField({
     isOptional: true,
-    isPhone: true,
-    max: 13,
+    isNumberString: true,
+    toInt: true,
   })
-  phone: string;
+  limit?: number;
 }
