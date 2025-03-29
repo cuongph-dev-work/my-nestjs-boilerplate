@@ -13,6 +13,11 @@ export type I18nTranslations = {
         "http.internalServerError": string;
         "http.unprocessableEntity": string;
     };
+    "mail": {
+        "resetPassword": {
+            "subject": string;
+        };
+    };
     "message": {
         "wrong_account": string;
         "login_attempts_exceeded": string;
@@ -23,6 +28,7 @@ export type I18nTranslations = {
         "reset_password_success": string;
         "invalid_reset_token": string;
         "set_first_password_success": string;
+        "file_not_found": string;
     };
     "validation": {
         "label": {
@@ -41,6 +47,7 @@ export type I18nTranslations = {
             "new_password_confirmation": string;
             "current_password": string;
             "token": string;
+            "file": string;
         };
         "IsString": string;
         "IsNotEmpty": string;
@@ -82,6 +89,7 @@ export type I18nTranslations = {
         "OnlyAlphaNumeric": string;
         "IsPhoneNumber": string;
         "IsIdentifyNumber": string;
+        "IsMustSelect": string;
     };
 };
 /* prettier-ignore */

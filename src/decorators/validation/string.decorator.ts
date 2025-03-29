@@ -19,6 +19,7 @@ import { ConfigService } from '@nestjs/config';
 import configs from '@configs/app';
 import { isEmpty, isNil } from 'lodash';
 import { transformValidationErrors } from '@utils/helper';
+import { IsURLOptions, IsEmailOptions, IsNumericOptions } from 'validator';
 
 const configService = new ConfigService(configs());
 
@@ -34,10 +35,9 @@ interface IStringValidationOption {
   isPassword?: boolean;
   isNumberString?: boolean;
   isSame?: string;
-  emailOptions?: ValidatorJS.IsEmailOptions;
-  urlOptions?: ValidatorJS.IsURLOptions;
-  numericOptions?: ValidatorJS.IsNumericOptions;
-  phoneOptions?: ValidatorJS.IsPhoneNumberOptions;
+  emailOptions?: IsEmailOptions;
+  urlOptions?: IsURLOptions;
+  numericOptions?: IsNumericOptions;
   toInt?: boolean;
 }
 
@@ -60,9 +60,6 @@ export const StringField = (
     emailOptions,
     urlOptions,
     numericOptions,
-    phoneOptions = {
-      defaultCountry: 'VN',
-    },
     toInt,
   } = options || {};
 

@@ -1,28 +1,30 @@
 import {
+  ChangePasswordDto,
+  ResetPasswordDto,
+  SetFirstPasswordDto,
+} from '@modules/auth/dtos';
+import {
   BadRequestException,
   forwardRef,
   Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { User } from '../../database/entities/user.entity';
+import { MailService } from '@shared/modules/mail/mail.service';
+import { addHours } from '@utils/date';
+import { generateToken, transformToValidationError } from '@utils/helper';
+import { createPaginationResponse } from '@utils/pagination';
+import { compare } from 'bcryptjs';
+import { plainToInstance } from 'class-transformer';
 import { I18nService } from 'nestjs-i18n';
-import { UserRepository } from './user.repository';
+import { User } from '../../database/entities/user.entity';
 import {
   CreateUserDto,
   SearchUserDto,
   ShowUserResponseDto,
   UpdateUserDto,
 } from './dtos';
-import { plainToInstance } from 'class-transformer';
-import { generateToken, transformToValidationError } from '@utils/helper';
-import { compare } from 'bcryptjs';
-import {
-  ChangePasswordDto,
-  ResetPasswordDto,
-  SetFirstPasswordDto,
-} from '@modules/auth/dtos';
-import { addHours } from '@utils/date';
+import { UserRepository } from './user.repository';
 
 @Injectable()
 export class UserService {
@@ -30,6 +32,7 @@ export class UserService {
     @Inject(forwardRef(() => UserRepository))
     private readonly userRepository: UserRepository,
     private readonly i18n: I18nService,
+    private readonly mailService: MailService,
   ) {}
 
   private async checkUniqueEmail(email: string) {
@@ -102,9 +105,19 @@ export class UserService {
   /**
    * Get users
    */
-  getUsers(query: SearchUserDto) {
-    console.log(query);
-    // return this.userRepository.getUsers(query);
+  async getUsers(query: SearchUserDto) {
+    const {
+      data: users,
+      total,
+      pagination,
+    } = await this.userRepository.getUsers(query);
+
+    return createPaginationResponse(
+      users,
+      total,
+      pagination.page,
+      pagination.limit,
+    );
   }
 
   /**
@@ -154,7 +167,11 @@ export class UserService {
       resetTokenExpiredAt.toJSDate(),
     );
 
-    // TODO: Send email to user
+    await this.mailService.sendPasswordResetMail({
+      to: user.email,
+      resetToken,
+      redirectUrl: body.redirect_url,
+    });
 
     return {
       message: this.i18n.t('message.reset_password_success'),

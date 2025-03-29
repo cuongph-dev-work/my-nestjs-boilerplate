@@ -1,10 +1,12 @@
 import { NODE_ENV } from '@configs/enum/app';
+import { STORAGE_DELETE_MODE, STORAGE_DRIVER } from '@configs/enum/file';
 
 export interface Config {
   database: DatabaseConfig;
   app: AppConfig;
   jwt: JwtConfig;
   mail: MailConfig;
+  storage: StorageConfig;
 }
 
 export interface AppConfig {
@@ -16,6 +18,7 @@ export interface AppConfig {
   redisHost: string;
   redisPort: number;
   redisPassword: string;
+  backendUrl: string;
 }
 
 export interface DatabaseConfig {
@@ -48,4 +51,14 @@ export interface MailConfig {
     password: string;
   };
   frontendUrl: string;
+}
+
+export interface StorageConfig {
+  driver: STORAGE_DRIVER;
+  deleteMode: STORAGE_DELETE_MODE;
+  cloudinary: {
+    cloudName: string;
+    apiKey: string;
+    apiSecret: string;
+  };
 }

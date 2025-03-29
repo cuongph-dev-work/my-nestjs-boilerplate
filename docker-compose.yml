@@ -1,7 +1,7 @@
 # docker-compose.yml
 
 services:
-  postgres:
+  db:
     image: postgres:17.0
     restart: always
     environment:
@@ -32,6 +32,19 @@ services:
       - 1025:1025
     networks:
       - nestjs-boilerplate-network
+
+  # api:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   restart: always
+  #   ports:
+  #     - '${PORT}:3000'
+  #   depends_on:
+  #     - db
+  #     - redis
+  #   networks:
+  #     - nestjs-boilerplate-network
 
 volumes:
   postgres:

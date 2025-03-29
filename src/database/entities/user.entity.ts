@@ -1,17 +1,15 @@
 import { USER_ROLE } from '@configs/enum/user';
 import {
   Entity,
-  PrimaryKey,
   Property,
   Enum,
   Filter,
-  BaseEntity,
   BeforeCreate,
   Opt,
   BeforeUpdate,
 } from '@mikro-orm/core';
-import { generateRandomId } from '@utils/helper';
 import * as bcrypt from 'bcryptjs';
+import { BaseEntity } from './base.entity';
 
 const SALT_ROUND = 11;
 /**
@@ -24,12 +22,6 @@ const SALT_ROUND = 11;
 @Filter({ name: 'isBlocked', cond: { block_to: { $gt: new Date() } } })
 @Filter({ name: 'isNotBlocked', cond: { block_to: { $lte: new Date() } } })
 export class User extends BaseEntity {
-  /**
-   * Primary key identifier for the user
-   */
-  @PrimaryKey({ columnType: 'varchar', length: 20 })
-  id: string = generateRandomId();
-
   /**
    * User's email address, must be unique
    */
@@ -103,31 +95,6 @@ export class User extends BaseEntity {
    */
   @Property({ nullable: true, columnType: 'timestamp with time zone' })
   block_to: Opt<Date>;
-
-  /**
-   * Timestamp when the user record was created
-   * Automatically set to current date when record is created
-   */
-  @Property({ columnType: 'timestamp with time zone' })
-  created_at: Opt<Date> = new Date();
-
-  /**
-   * Timestamp when the user record was last updated
-   * Automatically set to current date on update
-   */
-
-  @Property({
-    onUpdate: () => new Date(),
-    columnType: 'timestamp with time zone',
-  })
-  updated_at: Opt<Date> = new Date();
-
-  /**
-   * Soft delete timestamp, null for active users
-   * When set, indicates the user has been deleted
-   */
-  @Property({ nullable: true, columnType: 'timestamp with time zone' })
-  deleted_at: Opt<Date>;
 
   /**
    * Hash a password using bcrypt

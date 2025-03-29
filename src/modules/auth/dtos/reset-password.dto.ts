@@ -6,4 +6,13 @@ export class ResetPasswordDto {
     max: 255,
   })
   email: string;
+
+  @StringField({
+    max: 255,
+    isUrl: true,
+    urlOptions: {
+      require_tld: false,
+    },
+  })
+  redirect_url: string;
 }

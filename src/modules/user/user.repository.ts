@@ -8,7 +8,8 @@ import {
 } from '@mikro-orm/core';
 import { EntityManager } from '@mikro-orm/postgresql';
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto, UpdateUserDto } from './dtos';
+import { getPaginationParams } from '@utils/pagination';
+import { CreateUserDto, SearchUserDto, UpdateUserDto } from './dtos';
 
 @Injectable()
 export class UserRepository extends EntityRepository<User> {
@@ -109,5 +110,40 @@ export class UserRepository extends EntityRepository<User> {
     user.reset_token_expired_at = resetTokenExpiredAt;
     await this.em.flush();
     return { id: user.id };
+  }
+
+  /**
+   * Get users
+   */
+  async getUsers(query: SearchUserDto) {
+    const { page, limit, sortBy, sortOrder, skip } = getPaginationParams(query);
+
+    const conditions: FilterQuery<User> = {};
+
+    // search by email
+    if (query.email) {
+      conditions.email = { $like: `%${query.email}%` };
+    }
+
+    // search by phone
+    if (query.phone) {
+      conditions.phone = { $like: `%${query.phone}%` };
+    }
+
+    const [users, total] = await this.findAndCount(conditions, {
+      filters: ['isActive'],
+      orderBy: { [sortBy]: sortOrder },
+      offset: skip,
+      limit,
+    });
+
+    return {
+      data: users,
+      total,
+      pagination: {
+        page,
+        limit,
+      },
+    };
   }
 }

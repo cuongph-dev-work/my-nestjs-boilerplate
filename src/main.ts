@@ -16,6 +16,14 @@ async function bootstrap() {
     bufferLogs: true,
     logger: ['error', 'warn', 'debug', 'log'],
   });
+
+  app.setGlobalPrefix('/api');
+  app.enableCors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: '*',
+    // credentials: true,
+  });
   app.use(compression());
   app.use(helmet());
   app.useLogger(app.get(Logger));
@@ -24,8 +32,6 @@ async function bootstrap() {
     header: 'version',
     defaultVersion: '1',
   });
-  app.setGlobalPrefix('/api');
-  app.enableCors();
 
   const configService = app.get(ConfigService);
 

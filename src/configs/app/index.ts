@@ -1,6 +1,8 @@
-import { config as configDotEnv } from 'dotenv';
-import { Config } from './config.interface';
 import { NODE_ENV } from '@configs/enum/app';
+import { STORAGE_DELETE_MODE, STORAGE_DRIVER } from '@configs/enum/file';
+import { config as configDotEnv } from 'dotenv';
+import { toUpper } from 'lodash';
+import { Config } from './config.interface';
 
 configDotEnv();
 const configs = (): Config => {
@@ -14,6 +16,7 @@ const configs = (): Config => {
       redisHost: process.env.REDIS_HOST || 'localhost',
       redisPort: parseInt(process.env.REDIS_PORT || '6379'),
       redisPassword: process.env.REDIS_PASSWORD || '',
+      backendUrl: process.env.BACKEND_URL || 'http://localhost:3000',
     },
     database: {
       host: process.env.DB_HOST || 'localhost',
@@ -43,6 +46,19 @@ const configs = (): Config => {
         password: process.env.SMTP_PASSWORD || 'your-password',
       },
       frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3000',
+    },
+    storage: {
+      driver:
+        (toUpper(process.env.STORAGE_DRIVER) as STORAGE_DRIVER) ||
+        STORAGE_DRIVER.CLOUDINARY,
+      deleteMode:
+        (toUpper(process.env.STORAGE_DELETE_MODE) as STORAGE_DELETE_MODE) ||
+        STORAGE_DELETE_MODE.SOFT,
+      cloudinary: {
+        cloudName: process.env.STORAGE_CLOUDINARY_CLOUD_NAME || '',
+        apiKey: process.env.STORAGE_CLOUDINARY_API_KEY || '',
+        apiSecret: process.env.STORAGE_CLOUDINARY_API_SECRET || '',
+      },
     },
   };
 };
